@@ -8,11 +8,13 @@ app = Flask(__name__)
 
 # Database configuration
 # For local development, use SQLite
-# For PythonAnywhere, use MySQL (set DATABASE_URL environment variable)
+# For production (Render/PythonAnywhere), use DATABASE_URL environment variable
 database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # PythonAnywhere MySQL
+    # Fix for Render: postgres:// -> postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
     # Local SQLite for development
