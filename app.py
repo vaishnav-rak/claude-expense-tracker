@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, jsonify
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from models import db, Expense, Budget
 
@@ -28,6 +28,17 @@ db.init_app(app)
 # Create tables
 with app.app_context():
     db.create_all()
+
+
+def get_greeting():
+    ist = timezone(timedelta(hours=5, minutes=30))
+    hour = datetime.now(ist).hour
+    if 5 <= hour < 12:
+        return "Good Morning"
+    elif 12 <= hour < 17:
+        return "Good Afternoon"
+    else:
+        return "Good Evening"
 
 
 def get_expenses():
@@ -74,7 +85,8 @@ def index():
                          categories=categories_data,
                          grand_total=grand_total,
                          total_budget=total_budget,
-                         expenses=expenses[-10:])
+                         expenses=expenses[-10:],
+                         greeting=get_greeting())
 
 
 @app.route("/api/budgets", methods=["POST"])
