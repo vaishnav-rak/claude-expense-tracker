@@ -25,14 +25,70 @@
             margin: 0 auto;
         }
 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
         h1 {
             text-align: center;
-            margin-bottom: 30px;
+            flex: 1;
             font-size: 2.5rem;
             background: linear-gradient(90deg, #00d9ff, #00ff88);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .lang-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .lang-toggle span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .lang-switch {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 13px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .lang-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .lang-toggle.malayalam .lang-switch::after {
+            transform: translateX(24px);
+        }
+
+        .lang-toggle.malayalam .lang-switch {
+            background: rgba(0, 217, 255, 0.3);
         }
 
         .summary-cards {
@@ -306,23 +362,41 @@
             font-style: italic;
             font-size: 0.85rem;
         }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Expense Tracker</h1>
+        <div class="header">
+            <div></div>
+            <h1 data-i18n="title">Expense Tracker</h1>
+            <div class="lang-toggle" onclick="toggleLanguage()">
+                <span>EN</span>
+                <div class="lang-switch"></div>
+                <span>മല</span>
+            </div>
+        </div>
 
         <div class="summary-cards">
             <div class="card">
-                <div class="card-title">Total Spent</div>
+                <div class="card-title" data-i18n="totalSpent">Total Spent</div>
                 <div class="card-value red">₹{{ "%.2f"|format(grand_total) }}</div>
             </div>
             <div class="card">
-                <div class="card-title">Total Budget</div>
+                <div class="card-title" data-i18n="totalBudget">Total Budget</div>
                 <div class="card-value blue">₹{{ "%.2f"|format(total_budget) }}</div>
             </div>
             <div class="card">
-                <div class="card-title">Remaining</div>
+                <div class="card-title" data-i18n="remaining">Remaining</div>
                 <div class="card-value {% if total_budget - grand_total >= 0 %}green{% else %}red{% endif %}">
                     ₹{{ "%.2f"|format(total_budget - grand_total) }}
                 </div>
@@ -331,13 +405,13 @@
 
         <div class="chart-section">
             <div class="chart-container">
-                <h2 class="section-title">Spending Distribution</h2>
+                <h2 class="section-title" data-i18n="spendingDistribution">Spending Distribution</h2>
                 <div class="chart-wrapper">
                     <canvas id="spendingChart"></canvas>
                 </div>
             </div>
             <div class="chart-container">
-                <h2 class="section-title">Budget vs Spending</h2>
+                <h2 class="section-title" data-i18n="budgetVsSpending">Budget vs Spending</h2>
                 <div class="chart-wrapper">
                     <canvas id="budgetChart"></canvas>
                 </div>
@@ -346,7 +420,7 @@
 
         <div class="main-grid">
             <div class="section">
-                <h2 class="section-title">Spending by Category</h2>
+                <h2 class="section-title" data-i18n="spendingByCategory">Spending by Category</h2>
 
                 {% for cat in categories %}
                 <div class="category-item">
@@ -354,7 +428,7 @@
                         <div>
                             <span class="category-name">{{ cat.name }}</span>
                             {% if cat.over_budget %}
-                            <span class="alert-badge">Over by ₹{{ "%.2f"|format(cat.over_amount) }}</span>
+                            <span class="alert-badge"><span data-i18n="overBy">Over by</span> ₹{{ "%.2f"|format(cat.over_amount) }}</span>
                             {% endif %}
                         </div>
                         <div class="category-amounts">
@@ -362,7 +436,7 @@
                             {% if cat.budget > 0 %}
                             / ₹{{ "%.2f"|format(cat.budget) }}
                             {% else %}
-                            <span class="no-budget">(no budget set)</span>
+                            <span class="no-budget" data-i18n="noBudgetSet">(no budget set)</span>
                             {% endif %}
                         </div>
                     </div>
@@ -373,9 +447,9 @@
                         {% endif %}
                     </div>
                     <div class="budget-input">
-                        <input type="number" placeholder="Set budget" id="budget-{{ cat.name }}"
+                        <input type="number" data-i18n-placeholder="setBudget" placeholder="Set budget" id="budget-{{ cat.name }}"
                                value="{{ cat.budget if cat.budget > 0 else '' }}" step="0.01">
-                        <button onclick="updateBudget('{{ cat.name }}')">Set</button>
+                        <button onclick="updateBudget('{{ cat.name }}')" data-i18n="set">Set</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -383,22 +457,22 @@
 
             <div>
                 <div class="section" style="margin-bottom: 20px;">
-                    <h2 class="section-title">Add Expense</h2>
+                    <h2 class="section-title" data-i18n="addExpense">Add Expense</h2>
                     <form class="expense-form" onsubmit="addExpense(event)">
                         <input type="date" id="expense-date" required>
-                        <input type="text" id="expense-category" placeholder="Category" required list="categories">
+                        <input type="text" id="expense-category" data-i18n-placeholder="category" placeholder="Category" required list="categories">
                         <datalist id="categories">
                             {% for cat in categories %}
                             <option value="{{ cat.name }}">
                             {% endfor %}
                         </datalist>
-                        <input type="number" id="expense-amount" placeholder="Amount (₹)" step="0.01" required>
-                        <button type="submit">Add Expense</button>
+                        <input type="number" id="expense-amount" data-i18n-placeholder="amount" placeholder="Amount (₹)" step="0.01" required>
+                        <button type="submit" data-i18n="addExpenseBtn">Add Expense</button>
                     </form>
                 </div>
 
                 <div class="section">
-                    <h2 class="section-title">Recent Expenses</h2>
+                    <h2 class="section-title" data-i18n="recentExpenses">Recent Expenses</h2>
                     <div class="recent-expenses">
                         {% for expense in expenses|reverse %}
                         <div class="expense-item">
@@ -416,6 +490,92 @@
     </div>
 
     <script>
+        // Translations
+        const translations = {
+            en: {
+                title: "Expense Tracker",
+                totalSpent: "Total Spent",
+                totalBudget: "Total Budget",
+                remaining: "Remaining",
+                spendingDistribution: "Spending Distribution",
+                budgetVsSpending: "Budget vs Spending",
+                spendingByCategory: "Spending by Category",
+                overBy: "Over by",
+                noBudgetSet: "(no budget set)",
+                setBudget: "Set budget",
+                set: "Set",
+                addExpense: "Add Expense",
+                category: "Category",
+                amount: "Amount (₹)",
+                addExpenseBtn: "Add Expense",
+                recentExpenses: "Recent Expenses",
+                spent: "Spent",
+                budget: "Budget"
+            },
+            ml: {
+                title: "ചെലവ് ട്രാക്കർ",
+                totalSpent: "ആകെ ചെലവ്",
+                totalBudget: "ആകെ ബജറ്റ്",
+                remaining: "ബാക്കി",
+                spendingDistribution: "ചെലവ് വിതരണം",
+                budgetVsSpending: "ബജറ്റ് vs ചെലവ്",
+                spendingByCategory: "വിഭാഗം അനുസരിച്ച് ചെലവ്",
+                overBy: "അധികം",
+                noBudgetSet: "(ബജറ്റ് സെറ്റ് ചെയ്തിട്ടില്ല)",
+                setBudget: "ബജറ്റ് സെറ്റ് ചെയ്യുക",
+                set: "സെറ്റ്",
+                addExpense: "ചെലവ് ചേർക്കുക",
+                category: "വിഭാഗം",
+                amount: "തുക (₹)",
+                addExpenseBtn: "ചെലവ് ചേർക്കുക",
+                recentExpenses: "സമീപകാല ചെലവുകൾ",
+                spent: "ചെലവഴിച്ചത്",
+                budget: "ബജറ്റ്"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        function applyTranslations() {
+            const t = translations[currentLang];
+
+            // Update text content
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key]) {
+                    el.placeholder = t[key];
+                }
+            });
+
+            // Update page title
+            document.title = t.title;
+
+            // Update toggle state
+            const toggle = document.querySelector('.lang-toggle');
+            if (currentLang === 'ml') {
+                toggle.classList.add('malayalam');
+            } else {
+                toggle.classList.remove('malayalam');
+            }
+
+            // Update chart labels
+            updateChartLabels();
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ml' : 'en';
+            localStorage.setItem('lang', currentLang);
+            applyTranslations();
+        }
+
         // Set today's date as default
         document.getElementById('expense-date').valueAsDate = new Date();
 
@@ -431,7 +591,7 @@
         ];
 
         // Pie Chart - Spending Distribution
-        new Chart(document.getElementById('spendingChart'), {
+        const spendingChart = new Chart(document.getElementById('spendingChart'), {
             type: 'doughnut',
             data: {
                 labels: categoryNames,
@@ -468,19 +628,19 @@
         });
 
         // Bar Chart - Budget vs Spending
-        new Chart(document.getElementById('budgetChart'), {
+        const budgetChart = new Chart(document.getElementById('budgetChart'), {
             type: 'bar',
             data: {
                 labels: categoryNames,
                 datasets: [
                     {
-                        label: 'Spent',
+                        label: translations[currentLang].spent,
                         data: categorySpending,
                         backgroundColor: '#ff6b6b',
                         borderRadius: 4
                     },
                     {
-                        label: 'Budget',
+                        label: translations[currentLang].budget,
                         data: categoryBudgets,
                         backgroundColor: '#00d9ff',
                         borderRadius: 4
@@ -524,12 +684,19 @@
             }
         });
 
+        function updateChartLabels() {
+            const t = translations[currentLang];
+            budgetChart.data.datasets[0].label = t.spent;
+            budgetChart.data.datasets[1].label = t.budget;
+            budgetChart.update();
+        }
+
         async function updateBudget(category) {
             const input = document.getElementById(`budget-${category}`);
             const budget = parseFloat(input.value);
 
             if (isNaN(budget) || budget < 0) {
-                alert('Please enter a valid budget amount');
+                alert(currentLang === 'ml' ? 'ദയവായി സാധുവായ ബജറ്റ് തുക നൽകുക' : 'Please enter a valid budget amount');
                 return;
             }
 
@@ -561,6 +728,9 @@
                 location.reload();
             }
         }
+
+        // Apply translations on load
+        applyTranslations();
     </script>
 </body>
 </html>
