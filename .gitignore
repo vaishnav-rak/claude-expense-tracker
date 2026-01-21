@@ -3,3 +3,6 @@ __pycache__/
 .DS_Store
 budgets.json
 *.numbers
+*.db
+instance/
+.env

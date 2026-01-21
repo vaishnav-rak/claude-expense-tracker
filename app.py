@@ -1,54 +1,55 @@
+import os
 from flask import Flask, render_template, request, jsonify
-import csv
-import json
+from datetime import datetime
 from collections import defaultdict
+from models import db, Expense, Budget
 
 app = Flask(__name__)
-BUDGETS_FILE = "budgets.json"
-EXPENSES_FILE = "expenses.csv"
+
+# Database configuration
+# For local development, use SQLite
+# For PythonAnywhere, use MySQL (set DATABASE_URL environment variable)
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # PythonAnywhere MySQL
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Local SQLite for development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+db.init_app(app)
+
+# Create tables
+with app.app_context():
+    db.create_all()
 
 
-def load_expenses():
-    expenses = []
-    try:
-        with open(EXPENSES_FILE, "r") as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                expenses.append({
-                    "date": row["Date"],
-                    "category": row["Category"],
-                    "amount": float(row["Amount"])
-                })
-    except FileNotFoundError:
-        pass
-    return expenses
+def get_expenses():
+    expenses = Expense.query.order_by(Expense.date.desc()).all()
+    return [e.to_dict() for e in expenses]
 
 
-def load_budgets():
-    try:
-        with open(BUDGETS_FILE, "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {}
-
-
-def save_budgets(budgets):
-    with open(BUDGETS_FILE, "w") as file:
-        json.dump(budgets, file, indent=2)
+def get_budgets():
+    budgets = Budget.query.all()
+    return {b.category: b.amount for b in budgets}
 
 
 def calculate_totals(expenses):
     totals = defaultdict(float)
     for expense in expenses:
-        totals[expense["category"]] += expense["amount"]
+        totals[expense['category']] += expense['amount']
     return dict(totals)
 
 
 @app.route("/")
 def index():
-    expenses = load_expenses()
+    expenses = get_expenses()
     totals = calculate_totals(expenses)
-    budgets = load_budgets()
+    budgets = get_budgets()
 
     categories_data = []
     for category, spent in sorted(totals.items()):
@@ -71,24 +72,50 @@ def index():
                          categories=categories_data,
                          grand_total=grand_total,
                          total_budget=total_budget,
-                         expenses=expenses[-10:])  # Last 10 expenses
+                         expenses=expenses[-10:])
 
 
 @app.route("/api/budgets", methods=["POST"])
 def update_budgets():
     data = request.json
-    budgets = load_budgets()
-    budgets[data["category"]] = float(data["budget"])
-    save_budgets(budgets)
+    category = data["category"]
+    amount = float(data["budget"])
+
+    budget = Budget.query.filter_by(category=category).first()
+    if budget:
+        budget.amount = amount
+    else:
+        budget = Budget(category=category, amount=amount)
+        db.session.add(budget)
+
+    db.session.commit()
     return jsonify({"success": True})
 
 
 @app.route("/api/expense", methods=["POST"])
 def add_expense():
     data = request.json
-    with open(EXPENSES_FILE, "a", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow([data["date"], data["category"], data["amount"]])
+    expense = Expense(
+        date=datetime.strptime(data["date"], "%Y-%m-%d").date(),
+        category=data["category"],
+        amount=float(data["amount"])
+    )
+    db.session.add(expense)
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+@app.route("/api/expenses", methods=["GET"])
+def list_expenses():
+    expenses = get_expenses()
+    return jsonify(expenses)
+
+
+@app.route("/api/expenses/<int:expense_id>", methods=["DELETE"])
+def delete_expense(expense_id):
+    expense = Expense.query.get_or_404(expense_id)
+    db.session.delete(expense)
+    db.session.commit()
     return jsonify({"success": True})
 
 
