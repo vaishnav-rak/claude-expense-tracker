@@ -2,7 +2,8 @@ import os
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
-from models import db, Expense, Budget
+from models import db, Expense, Budget, SUPPORTED_CURRENCIES, DEFAULT_CURRENCY
+from forex_service import convert_to_inr, get_exchange_rates, get_currency_symbol, format_currency
 
 app = Flask(__name__)
 
@@ -86,7 +87,9 @@ def index():
                          grand_total=grand_total,
                          total_budget=total_budget,
                          expenses=expenses[-10:],
-                         greeting=get_greeting())
+                         greeting=get_greeting(),
+                         supported_currencies=SUPPORTED_CURRENCIES,
+                         default_currency=DEFAULT_CURRENCY)
 
 
 @app.route("/api/budgets", methods=["POST"])
@@ -109,14 +112,27 @@ def update_budgets():
 @app.route("/api/expense", methods=["POST"])
 def add_expense():
     data = request.json
+    original_amount = float(data["amount"])
+    currency = data.get("currency", "INR").upper()
+
+    # Validate currency
+    if currency not in SUPPORTED_CURRENCIES:
+        currency = "INR"
+
+    # Convert to INR
+    amount_inr, exchange_rate = convert_to_inr(original_amount, currency)
+
     expense = Expense(
         date=datetime.strptime(data["date"], "%Y-%m-%d").date(),
         category=data["category"],
-        amount=float(data["amount"])
+        amount=amount_inr,
+        original_amount=original_amount,
+        original_currency=currency,
+        exchange_rate=exchange_rate
     )
     db.session.add(expense)
     db.session.commit()
-    return jsonify({"success": True})
+    return jsonify({"success": True, "amount_inr": amount_inr, "exchange_rate": exchange_rate})
 
 
 @app.route("/api/expenses", methods=["GET"])
@@ -131,6 +147,17 @@ def delete_expense(expense_id):
     db.session.delete(expense)
     db.session.commit()
     return jsonify({"success": True})
+
+
+@app.route("/api/exchange-rates", methods=["GET"])
+def get_rates():
+    """Get current exchange rates (1 unit of each currency = X INR)."""
+    rates = get_exchange_rates()
+    return jsonify({
+        "rates": rates,
+        "base": "INR",
+        "supported_currencies": SUPPORTED_CURRENCIES
+    })
 
 
 if __name__ == "__main__":

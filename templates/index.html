@@ -385,13 +385,28 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
-            align-items: end;
+            align-items: start;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 6px;
+        }
+
+        .form-group-currency {
+            position: relative;
+        }
+
+        .form-group-currency .exchange-rate-info {
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+        }
+
+        .expense-form .btn-primary {
+            margin-top: 22px;
+            height: 46px;
         }
 
         .form-group label {
@@ -484,6 +499,91 @@
             font-weight: 700;
             color: #ef4444;
             font-size: 1.1rem;
+            text-align: right;
+        }
+
+        .expense-original {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .currency-select {
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+            background: white;
+            cursor: pointer;
+        }
+
+        .currency-select:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .exchange-rate-info {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .currency-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #e0e7ff;
+            color: #4f46e5;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444, #f87171);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
 
         /* Settings Page */
@@ -526,6 +626,7 @@
     </style>
 </head>
 <body>
+    <div class="toast-container" id="toast-container"></div>
     <div class="container">
         <div class="greeting" style="font-size: 1.5rem; font-weight: 600; color: #6366f1; margin-bottom: 8px;">
             {{ greeting }}
@@ -611,8 +712,19 @@
                             {% endfor %}
                         </datalist>
                     </div>
+                    <div class="form-group form-group-currency">
+                        <label data-i18n="currency">Currency</label>
+                        <select id="expense-currency" class="currency-select" onchange="updateAmountLabel()">
+                            {% for curr in supported_currencies %}
+                            <option value="{{ curr }}" {% if curr == default_currency %}selected{% endif %}>
+                                {{ curr }}{% if curr == 'INR' %} (₹){% elif curr == 'USD' %} ($){% elif curr == 'GBP' %} (£){% elif curr == 'THB' %} (฿){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div id="exchange-rate-display" class="exchange-rate-info"></div>
+                    </div>
                     <div class="form-group">
-                        <label data-i18n="amount">Amount (₹)</label>
+                        <label data-i18n="amount" id="amount-label">Amount (₹)</label>
                         <input type="number" id="expense-amount" placeholder="0.00" step="0.01" required>
                     </div>
                     <button type="submit" class="btn-primary" data-i18n="addExpenseBtn">Add Expense</button>
@@ -626,11 +738,23 @@
                     <div class="expense-info">
                         <div class="expense-icon">{{ expense.category[0] }}</div>
                         <div class="expense-details">
-                            <span class="expense-category">{{ expense.category }}</span>
+                            <span class="expense-category">
+                                {{ expense.category }}
+                                {% if expense.original_currency and expense.original_currency != 'INR' %}
+                                <span class="currency-badge">{{ expense.original_currency }}</span>
+                                {% endif %}
+                            </span>
                             <span class="expense-date">{{ expense.date }}</span>
                         </div>
                     </div>
-                    <span class="expense-amount">-₹{{ "%.2f"|format(expense.amount) }}</span>
+                    <div class="expense-amount">
+                        -₹{{ "%.2f"|format(expense.amount) }}
+                        {% if expense.original_currency and expense.original_currency != 'INR' %}
+                        <div class="expense-original">
+                            ({% if expense.original_currency == 'USD' %}${% elif expense.original_currency == 'GBP' %}£{% elif expense.original_currency == 'THB' %}฿{% else %}{{ expense.original_currency }}{% endif %}{{ "%.2f"|format(expense.original_amount) }})
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -742,7 +866,8 @@
                 date: "Date",
                 category: "Category",
                 categoryPlaceholder: "e.g. Food, Transport",
-                amount: "Amount (₹)",
+                amount: "Amount",
+                currency: "Currency",
                 addExpenseBtn: "Add Expense",
                 recentExpenses: "Recent Expenses",
                 spent: "Spent",
@@ -771,7 +896,8 @@
                 date: "തീയതി",
                 category: "വിഭാഗം",
                 categoryPlaceholder: "ഉദാ: ഭക്ഷണം, യാത്ര",
-                amount: "തുക (₹)",
+                amount: "തുക",
+                currency: "കറൻസി",
                 addExpenseBtn: "ചെലവ് ചേർക്കുക",
                 recentExpenses: "സമീപകാല ചെലവുകൾ",
                 spent: "ചെലവഴിച്ചത്",
@@ -1024,12 +1150,24 @@
             }
         }
 
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'} ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
         async function updateBudget(category) {
             const input = document.getElementById(`budget-${category}`);
             const budget = parseFloat(input.value);
 
             if (isNaN(budget) || budget < 0) {
-                alert(currentLang === 'ml' ? 'ദയവായി സാധുവായ ബജറ്റ് തുക നൽകുക' : 'Please enter a valid budget amount');
+                showToast(currentLang === 'ml' ? 'ദയവായി സാധുവായ ബജറ്റ് തുക നൽകുക' : 'Please enter a valid budget amount', 'error');
                 return;
             }
 
@@ -1040,7 +1178,9 @@
             });
 
             if (response.ok) {
-                location.reload();
+                showToast(currentLang === 'ml' ? `${category} ബജറ്റ് അപ്ഡേറ്റ് ചെയ്തു` : `Budget updated for ${category}`);
+            } else {
+                showToast(currentLang === 'ml' ? 'ബജറ്റ് അപ്ഡേറ്റ് പരാജയപ്പെട്ടു' : 'Failed to update budget', 'error');
             }
         }
 
@@ -1050,11 +1190,12 @@
             const date = document.getElementById('expense-date').value;
             const category = document.getElementById('expense-category').value;
             const amount = parseFloat(document.getElementById('expense-amount').value);
+            const currency = document.getElementById('expense-currency').value;
 
             const response = await fetch('/api/expense', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date, category, amount })
+                body: JSON.stringify({ date, category, amount, currency })
             });
 
             if (response.ok) {
@@ -1062,9 +1203,48 @@
             }
         }
 
+        // Currency symbols mapping
+        const currencySymbols = {
+            'INR': '₹',
+            'USD': '$',
+            'GBP': '£',
+            'THB': '฿'
+        };
+
+        // Exchange rates cache
+        let exchangeRates = null;
+
+        async function fetchExchangeRates() {
+            try {
+                const response = await fetch('/api/exchange-rates');
+                const data = await response.json();
+                exchangeRates = data.rates;
+                updateAmountLabel();
+            } catch (error) {
+                console.error('Failed to fetch exchange rates:', error);
+            }
+        }
+
+        function updateAmountLabel() {
+            const currency = document.getElementById('expense-currency').value;
+            const symbol = currencySymbols[currency] || currency;
+            const label = document.getElementById('amount-label');
+            const rateDisplay = document.getElementById('exchange-rate-display');
+
+            label.textContent = `Amount (${symbol})`;
+
+            if (currency !== 'INR' && exchangeRates && exchangeRates[currency]) {
+                const rate = exchangeRates[currency].toFixed(2);
+                rateDisplay.textContent = `1 ${currency} = ₹${rate}`;
+            } else {
+                rateDisplay.textContent = '';
+            }
+        }
+
         // Initialize
         initCharts();
         applyTranslations();
+        fetchExchangeRates();
     </script>
 </body>
 </html>
