@@ -4,6 +4,7 @@ from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from models import db, Expense, Budget, SUPPORTED_CURRENCIES, DEFAULT_CURRENCY
 from forex_service import convert_to_inr, get_exchange_rates, get_currency_symbol, format_currency
+from gemini_service import calculate_investment_tax
 
 app = Flask(__name__)
 
@@ -158,6 +159,51 @@ def get_rates():
         "base": "INR",
         "supported_currencies": SUPPORTED_CURRENCIES
     })
+
+
+@app.route("/api/tax-calculate", methods=["POST"])
+def tax_calculate():
+    data = request.json
+    if not data:
+        return jsonify({"success": False, "error": "No data provided"}), 400
+
+    # Validate required fields
+    required = ["investment_type", "amount", "deposit_date", "withdrawal_date"]
+    for field in required:
+        if not data.get(field):
+            return jsonify({"success": False, "error": f"Missing required field: {field}"}), 400
+
+    try:
+        amount = float(data["amount"])
+    except (ValueError, TypeError):
+        return jsonify({"success": False, "error": "Amount must be a valid number"}), 400
+
+    if amount <= 0:
+        return jsonify({"success": False, "error": "Amount must be positive"}), 400
+
+    # Validate dates
+    try:
+        deposit = datetime.strptime(data["deposit_date"], "%Y-%m-%d")
+        withdrawal = datetime.strptime(data["withdrawal_date"], "%Y-%m-%d")
+    except ValueError:
+        return jsonify({"success": False, "error": "Invalid date format. Use YYYY-MM-DD"}), 400
+
+    if withdrawal <= deposit:
+        return jsonify({"success": False, "error": "Withdrawal date must be after deposit date"}), 400
+
+    age_bracket = data.get("age_bracket", "general")
+    income_slab = data.get("income_slab", "above_10l")
+
+    result = calculate_investment_tax(
+        investment_type=data["investment_type"],
+        amount=amount,
+        deposit_date=data["deposit_date"],
+        withdrawal_date=data["withdrawal_date"],
+        age_bracket=age_bracket,
+        income_slab=income_slab
+    )
+
+    return jsonify({"success": True, "result": result})
 
 
 if __name__ == "__main__":

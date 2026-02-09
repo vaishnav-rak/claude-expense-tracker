@@ -607,6 +607,202 @@
             color: #1a1a2e;
         }
 
+        /* Tax Calculator */
+        .tax-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            align-items: start;
+        }
+
+        .tax-form .form-group textarea,
+        .tax-form .form-group select {
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        .tax-form .form-group textarea:focus,
+        .tax-form .form-group select:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .tax-form .form-group textarea {
+            resize: vertical;
+            min-height: 46px;
+            max-height: 100px;
+        }
+
+        .tax-form .btn-primary {
+            margin-top: 22px;
+            height: 46px;
+        }
+
+        .tax-loading {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .tax-loading.active {
+            display: block;
+        }
+
+        .tax-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .tax-loading p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .tax-results {
+            display: none;
+        }
+
+        .tax-results.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tax-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .tax-summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+
+        .tax-summary-card .label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .tax-summary-card .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .tax-summary-card .value.green { color: #10b981; }
+        .tax-summary-card .value.red { color: #ef4444; }
+        .tax-summary-card .value.blue { color: #3b82f6; }
+        .tax-summary-card .value.purple { color: #8b5cf6; }
+
+        .confidence-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .confidence-fill.high { background: linear-gradient(90deg, #10b981, #34d399); }
+        .confidence-fill.medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .confidence-fill.low { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        .tax-detail-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        .tax-detail-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .detail-label {
+            color: #64748b;
+        }
+
+        .detail-row .detail-value {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .explanation-block {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        .explanation-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .explanation-block strong {
+            color: #1a1a2e;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .tax-disclaimer {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #92400e;
+            line-height: 1.5;
+        }
+
         @media (max-width: 600px) {
             .header {
                 flex-direction: column;
@@ -621,6 +817,12 @@
             }
             .expense-form {
                 grid-template-columns: 1fr;
+            }
+            .tax-form {
+                grid-template-columns: 1fr;
+            }
+            .tax-summary-cards {
+                grid-template-columns: 1fr 1fr;
             }
         }
     </style>
@@ -648,6 +850,7 @@
             <button class="tab" onclick="switchTab('expenses')" data-i18n="expenses">Expenses</button>
             <button class="tab" onclick="switchTab('budgets')" data-i18n="budgets">Budgets</button>
             <button class="tab" onclick="switchTab('analytics')" data-i18n="analytics">Analytics</button>
+            <button class="tab" onclick="switchTab('tax-calculator')" data-i18n="taxCalculator">Tax Calculator</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -841,6 +1044,99 @@
                 </div>
             </div>
         </div>
+
+        <!-- Tax Calculator Tab -->
+        <div id="tax-calculator" class="tab-content">
+            <div class="form-card">
+                <h2 data-i18n="taxCalcTitle">Investment Tax Calculator</h2>
+                <form class="tax-form" onsubmit="calculateTax(event)">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label data-i18n="investmentType">Investment Type</label>
+                        <textarea id="tax-investment-type" data-i18n-placeholder="investmentTypePlaceholder" placeholder="e.g. Equity Mutual Fund, Debt Fund, Listed Shares, Gold ETF, Real Estate" required rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="investmentAmount">Investment Amount (INR)</label>
+                        <input type="number" id="tax-amount" placeholder="500000" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="depositDate">Date of Investment</label>
+                        <input type="date" id="tax-deposit-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="withdrawalDate">Date of Withdrawal</label>
+                        <input type="date" id="tax-withdrawal-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="ageBracket">Age Bracket</label>
+                        <select id="tax-age-bracket">
+                            <option value="general" data-i18n="ageBelow60">Below 60 years</option>
+                            <option value="senior" data-i18n="age60to80">60 - 80 years</option>
+                            <option value="super_senior" data-i18n="ageAbove80">Above 80 years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="incomeSlab">Income Tax Slab</label>
+                        <select id="tax-income-slab">
+                            <option value="below_2.5l" data-i18n="slabBelow2_5">Below 2.5 Lakhs</option>
+                            <option value="2.5l_5l" data-i18n="slab2_5to5">2.5 - 5 Lakhs</option>
+                            <option value="5l_7.5l" data-i18n="slab5to7_5">5 - 7.5 Lakhs</option>
+                            <option value="7.5l_10l" data-i18n="slab7_5to10">7.5 - 10 Lakhs</option>
+                            <option value="10l_12.5l" data-i18n="slab10to12_5">10 - 12.5 Lakhs</option>
+                            <option value="above_10l" data-i18n="slabAbove10" selected>Above 10 Lakhs</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary" data-i18n="calculateTaxBtn">Calculate Tax</button>
+                </form>
+            </div>
+
+            <div class="tax-loading" id="tax-loading">
+                <div class="tax-spinner"></div>
+                <p data-i18n="analyzingAI">Analyzing with AI...</p>
+            </div>
+
+            <div class="tax-results" id="tax-results">
+                <div class="tax-summary-cards">
+                    <div class="tax-summary-card">
+                        <div class="label" data-i18n="investmentAmountLabel">Investment Amount</div>
+                        <div class="value green" id="tax-res-amount">-</div>
+                    </div>
+                    <div class="tax-summary-card">
+                        <div class="label" data-i18n="taxAmountLabel">Tax Amount</div>
+                        <div class="value red" id="tax-res-tax">-</div>
+                    </div>
+                    <div class="tax-summary-card">
+                        <div class="label" data-i18n="effectiveRateLabel">Effective Rate</div>
+                        <div class="value blue" id="tax-res-rate">-</div>
+                    </div>
+                    <div class="tax-summary-card">
+                        <div class="label" data-i18n="confidenceLabel">AI Confidence</div>
+                        <div class="value purple" id="tax-res-confidence">-</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="tax-confidence-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tax-detail-section" id="tax-classification-section">
+                    <h3 data-i18n="classificationTitle">Classification Details</h3>
+                    <div id="tax-classification-details"></div>
+                </div>
+
+                <div class="tax-detail-section" id="tax-computation-section">
+                    <h3 data-i18n="computationTitle">Tax Computation</h3>
+                    <div id="tax-computation-details"></div>
+                </div>
+
+                <div class="tax-detail-section" id="tax-explanation-section">
+                    <h3 data-i18n="explanationTitle">AI Explanation & Audit Trail</h3>
+                    <div id="tax-explanation-details"></div>
+                </div>
+
+                <div class="tax-disclaimer" data-i18n="taxDisclaimer">
+                    This tax calculation is AI-generated and for informational purposes only. It should not be considered as professional tax advice. Please consult a qualified Chartered Accountant or tax professional for actual tax filing. Tax laws are subject to change and individual circumstances may vary.
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -874,7 +1170,58 @@
                 budget: "Budget",
                 highestSpending: "Highest Spending",
                 totalCategories: "Total Categories",
-                avgPerCategory: "Avg per Category"
+                avgPerCategory: "Avg per Category",
+                taxCalculator: "Tax Calculator",
+                taxCalcTitle: "Investment Tax Calculator",
+                investmentType: "Investment Type",
+                investmentTypePlaceholder: "e.g. Equity Mutual Fund, Debt Fund, Listed Shares, Gold ETF, Real Estate",
+                investmentAmount: "Investment Amount (INR)",
+                depositDate: "Date of Investment",
+                withdrawalDate: "Date of Withdrawal",
+                ageBracket: "Age Bracket",
+                ageBelow60: "Below 60 years",
+                age60to80: "60 - 80 years",
+                ageAbove80: "Above 80 years",
+                incomeSlab: "Income Tax Slab",
+                slabBelow2_5: "Below 2.5 Lakhs",
+                slab2_5to5: "2.5 - 5 Lakhs",
+                slab5to7_5: "5 - 7.5 Lakhs",
+                slab7_5to10: "7.5 - 10 Lakhs",
+                slab10to12_5: "10 - 12.5 Lakhs",
+                slabAbove10: "Above 10 Lakhs",
+                calculateTaxBtn: "Calculate Tax",
+                analyzingAI: "Analyzing with AI...",
+                investmentAmountLabel: "Investment Amount",
+                taxAmountLabel: "Tax Amount",
+                effectiveRateLabel: "Effective Rate",
+                confidenceLabel: "AI Confidence",
+                classificationTitle: "Classification Details",
+                computationTitle: "Tax Computation",
+                explanationTitle: "AI Explanation & Audit Trail",
+                taxDisclaimer: "This tax calculation is AI-generated and for informational purposes only. It should not be considered as professional tax advice. Please consult a qualified Chartered Accountant or tax professional for actual tax filing. Tax laws are subject to change and individual circumstances may vary.",
+                classCategory: "Investment Category",
+                classGainType: "Gain Type",
+                classHoldingDays: "Holding Period (Days)",
+                classThreshold: "LTCG Threshold (Days)",
+                classAnalysis: "Holding Analysis",
+                compSection: "Applicable Section",
+                compBaseRate: "Base Tax Rate",
+                compSurcharge: "Surcharge",
+                compCess: "Health & Education Cess",
+                compExemption: "Exemption Limit",
+                compTaxable: "Taxable Amount",
+                compTaxBeforeCess: "Tax Before Cess",
+                compCessAmount: "Cess Amount",
+                compTotalTax: "Total Tax",
+                compEffectiveRate: "Effective Tax Rate",
+                expClassReasoning: "Classification Reasoning",
+                expTaxReasoning: "Tax Section Reasoning",
+                expExemptions: "Exemption Details",
+                expNotes: "Important Notes",
+                validationFillFields: "Please fill in all required fields",
+                validationPositiveAmount: "Please enter a positive amount",
+                validationDateOrder: "Withdrawal date must be after investment date",
+                taxCalcError: "Failed to calculate tax. Please try again."
             },
             ml: {
                 title: "മണിസേവർ",
@@ -904,7 +1251,58 @@
                 budget: "ബജറ്റ്",
                 highestSpending: "ഏറ്റവും കൂടുതൽ ചെലവ്",
                 totalCategories: "ആകെ വിഭാഗങ്ങൾ",
-                avgPerCategory: "ശരാശരി ചെലവ്"
+                avgPerCategory: "ശരാശരി ചെലവ്",
+                taxCalculator: "നികുതി കാൽക്കുലേറ്റർ",
+                taxCalcTitle: "നിക്ഷേപ നികുതി കാൽക്കുലേറ്റർ",
+                investmentType: "നിക്ഷേപ തരം",
+                investmentTypePlaceholder: "ഉദാ: ഇക്വിറ്റി മ്യൂച്വൽ ഫണ്ട്, ഡെറ്റ് ഫണ്ട്, ഓഹരികൾ, സ്വർണ്ണ ETF, റിയൽ എസ്റ്റേറ്റ്",
+                investmentAmount: "നിക്ഷേപ തുക (INR)",
+                depositDate: "നിക്ഷേപ തീയതി",
+                withdrawalDate: "പിൻവലിക്കൽ തീയതി",
+                ageBracket: "പ്രായ വിഭാഗം",
+                ageBelow60: "60 വയസ്സിന് താഴെ",
+                age60to80: "60 - 80 വയസ്സ്",
+                ageAbove80: "80 വയസ്സിന് മുകളിൽ",
+                incomeSlab: "ആദായ നികുതി സ്ലാബ്",
+                slabBelow2_5: "2.5 ലക്ഷത്തിന് താഴെ",
+                slab2_5to5: "2.5 - 5 ലക്ഷം",
+                slab5to7_5: "5 - 7.5 ലക്ഷം",
+                slab7_5to10: "7.5 - 10 ലക്ഷം",
+                slab10to12_5: "10 - 12.5 ലക്ഷം",
+                slabAbove10: "10 ലക്ഷത്തിന് മുകളിൽ",
+                calculateTaxBtn: "നികുതി കണക്കാക്കുക",
+                analyzingAI: "AI ഉപയോഗിച്ച് വിശകലനം ചെയ്യുന്നു...",
+                investmentAmountLabel: "നിക്ഷേപ തുക",
+                taxAmountLabel: "നികുതി തുക",
+                effectiveRateLabel: "ഫലപ്രദ നിരക്ക്",
+                confidenceLabel: "AI ആത്മവിശ്വാസം",
+                classificationTitle: "വർഗ്ഗീകരണ വിശദാംശങ്ങൾ",
+                computationTitle: "നികുതി കണക്കുകൂട്ടൽ",
+                explanationTitle: "AI വിശദീകരണവും ഓഡിറ്റ് ട്രെയിലും",
+                taxDisclaimer: "ഈ നികുതി കണക്കുകൂട്ടൽ AI സൃഷ്ടിച്ചതാണ്, വിവര ആവശ്യങ്ങൾക്ക് മാത്രമുള്ളതാണ്. ഇത് പ്രൊഫഷണൽ നികുതി ഉപദേശമായി കണക്കാക്കരുത്. യഥാർത്ഥ നികുതി ഫയലിംഗിന് യോഗ്യതയുള്ള ചാർട്ടേഡ് അക്കൗണ്ടന്റിനെ സമീപിക്കുക.",
+                classCategory: "നിക്ഷേപ വിഭാഗം",
+                classGainType: "ലാഭ തരം",
+                classHoldingDays: "കൈവശം വച്ച കാലാവധി (ദിവസം)",
+                classThreshold: "LTCG പരിധി (ദിവസം)",
+                classAnalysis: "കൈവശ വിശകലനം",
+                compSection: "ബാധകമായ വകുപ്പ്",
+                compBaseRate: "അടിസ്ഥാന നികുതി നിരക്ക്",
+                compSurcharge: "സർചാർജ്",
+                compCess: "ആരോഗ്യ & വിദ്യാഭ്യാസ സെസ്",
+                compExemption: "ഇളവ് പരിധി",
+                compTaxable: "നികുതിയോഗ്യ തുക",
+                compTaxBeforeCess: "സെസ്സിന് മുമ്പുള്ള നികുതി",
+                compCessAmount: "സെസ് തുക",
+                compTotalTax: "ആകെ നികുതി",
+                compEffectiveRate: "ഫലപ്രദ നികുതി നിരക്ക്",
+                expClassReasoning: "വർഗ്ഗീകരണ യുക്തി",
+                expTaxReasoning: "നികുതി വകുപ്പ് യുക്തി",
+                expExemptions: "ഇളവ് വിശദാംശങ്ങൾ",
+                expNotes: "പ്രധാന കുറിപ്പുകൾ",
+                validationFillFields: "ദയവായി ആവശ്യമായ എല്ലാ ഫീൽഡുകളും പൂരിപ്പിക്കുക",
+                validationPositiveAmount: "ദയവായി ഒരു പോസിറ്റീവ് തുക നൽകുക",
+                validationDateOrder: "പിൻവലിക്കൽ തീയതി നിക്ഷേപ തീയതിക്ക് ശേഷമായിരിക്കണം",
+                taxCalcError: "നികുതി കണക്കാക്കൽ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക."
             }
         };
 
@@ -1239,6 +1637,123 @@
             } else {
                 rateDisplay.textContent = '';
             }
+        }
+
+        // Tax Calculator
+        async function calculateTax(event) {
+            event.preventDefault();
+
+            const t = translations[currentLang];
+            const investmentType = document.getElementById('tax-investment-type').value.trim();
+            const amount = parseFloat(document.getElementById('tax-amount').value);
+            const depositDate = document.getElementById('tax-deposit-date').value;
+            const withdrawalDate = document.getElementById('tax-withdrawal-date').value;
+            const ageBracket = document.getElementById('tax-age-bracket').value;
+            const incomeSlab = document.getElementById('tax-income-slab').value;
+
+            if (!investmentType || !depositDate || !withdrawalDate || isNaN(amount)) {
+                showToast(t.validationFillFields, 'error');
+                return;
+            }
+
+            if (amount <= 0) {
+                showToast(t.validationPositiveAmount, 'error');
+                return;
+            }
+
+            if (new Date(withdrawalDate) <= new Date(depositDate)) {
+                showToast(t.validationDateOrder, 'error');
+                return;
+            }
+
+            // Show loading, hide results
+            document.getElementById('tax-loading').classList.add('active');
+            document.getElementById('tax-results').classList.remove('active');
+
+            try {
+                const response = await fetch('/api/tax-calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        investment_type: investmentType,
+                        amount: amount,
+                        deposit_date: depositDate,
+                        withdrawal_date: withdrawalDate,
+                        age_bracket: ageBracket,
+                        income_slab: incomeSlab
+                    })
+                });
+
+                const data = await response.json();
+
+                document.getElementById('tax-loading').classList.remove('active');
+
+                if (data.success) {
+                    displayTaxResults(data.result, amount);
+                } else {
+                    showToast(data.error || t.taxCalcError, 'error');
+                }
+            } catch (error) {
+                document.getElementById('tax-loading').classList.remove('active');
+                showToast(t.taxCalcError, 'error');
+                console.error('Tax calculation error:', error);
+            }
+        }
+
+        function displayTaxResults(result, investmentAmount) {
+            const t = translations[currentLang];
+            const tc = result.tax_computation;
+            const cl = result.classification;
+            const ex = result.explanation;
+
+            // Summary cards
+            document.getElementById('tax-res-amount').textContent = '₹' + investmentAmount.toLocaleString('en-IN');
+            document.getElementById('tax-res-tax').textContent = '₹' + (tc.total_tax || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+            document.getElementById('tax-res-rate').textContent = (tc.effective_rate_percent || 0).toFixed(2) + '%';
+
+            const confidence = result.confidence || 0;
+            document.getElementById('tax-res-confidence').textContent = (confidence * 100).toFixed(0) + '%';
+
+            const confBar = document.getElementById('tax-confidence-bar');
+            confBar.style.width = (confidence * 100) + '%';
+            confBar.className = 'confidence-fill ' + (confidence >= 0.7 ? 'high' : confidence >= 0.4 ? 'medium' : 'low');
+
+            // Classification details
+            const classHtml = `
+                <div class="detail-row"><span class="detail-label">${t.classCategory}</span><span class="detail-value">${cl.investment_category || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classGainType}</span><span class="detail-value">${cl.gain_type || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classHoldingDays}</span><span class="detail-value">${cl.holding_period_days || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classThreshold}</span><span class="detail-value">${cl.ltcg_threshold_days || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classAnalysis}</span><span class="detail-value">${cl.holding_analysis || '-'}</span></div>
+            `;
+            document.getElementById('tax-classification-details').innerHTML = classHtml;
+
+            // Tax computation details
+            const compHtml = `
+                <div class="detail-row"><span class="detail-label">${t.compSection}</span><span class="detail-value">${tc.applicable_section || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compBaseRate}</span><span class="detail-value">${tc.base_tax_rate_percent || 0}%</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compSurcharge}</span><span class="detail-value">${tc.surcharge_percent || 0}%</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compCess}</span><span class="detail-value">${tc.cess_percent || 0}%</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compExemption}</span><span class="detail-value">₹${(tc.exemption_limit || 0).toLocaleString('en-IN')}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compTaxable}</span><span class="detail-value">₹${(tc.taxable_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compTaxBeforeCess}</span><span class="detail-value">₹${(tc.tax_before_cess || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compCessAmount}</span><span class="detail-value">₹${(tc.cess_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compTotalTax}</span><span class="detail-value" style="color: #ef4444; font-size: 1.1rem;">₹${(tc.total_tax || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compEffectiveRate}</span><span class="detail-value">${(tc.effective_rate_percent || 0).toFixed(2)}%</span></div>
+            `;
+            document.getElementById('tax-computation-details').innerHTML = compHtml;
+
+            // Explanation details
+            const expHtml = `
+                <div class="explanation-block"><strong>${t.expClassReasoning}</strong>${ex.classification_reasoning || '-'}</div>
+                <div class="explanation-block"><strong>${t.expTaxReasoning}</strong>${ex.tax_section_reasoning || '-'}</div>
+                <div class="explanation-block"><strong>${t.expExemptions}</strong>${ex.exemption_details || '-'}</div>
+                <div class="explanation-block"><strong>${t.expNotes}</strong>${ex.important_notes || '-'}</div>
+            `;
+            document.getElementById('tax-explanation-details').innerHTML = expHtml;
+
+            // Show results
+            document.getElementById('tax-results').classList.add('active');
         }
 
         // Initialize
