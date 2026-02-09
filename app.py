@@ -1,10 +1,11 @@
 import os
+import json
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
-from models import db, Expense, Budget, SUPPORTED_CURRENCIES, DEFAULT_CURRENCY
+from models import db, Expense, Budget, TaxCalculation, SUPPORTED_CURRENCIES, DEFAULT_CURRENCY
 from forex_service import convert_to_inr, get_exchange_rates, get_currency_symbol, format_currency
-from gemini_service import calculate_investment_tax
+from gemini_service import calculate_investment_tax, get_fallback_response, is_gemini_available
 
 app = Flask(__name__)
 
@@ -161,6 +162,11 @@ def get_rates():
     })
 
 
+@app.route("/api/gemini-status", methods=["GET"])
+def gemini_status():
+    return jsonify({"available": is_gemini_available()})
+
+
 @app.route("/api/tax-calculate", methods=["POST"])
 def tax_calculate():
     data = request.json
@@ -193,17 +199,51 @@ def tax_calculate():
 
     age_bracket = data.get("age_bracket", "general")
     income_slab = data.get("income_slab", "above_10l")
+    use_ai = data.get("use_ai", True)
 
-    result = calculate_investment_tax(
+    if use_ai:
+        result = calculate_investment_tax(
+            investment_type=data["investment_type"],
+            amount=amount,
+            deposit_date=data["deposit_date"],
+            withdrawal_date=data["withdrawal_date"],
+            age_bracket=age_bracket,
+            income_slab=income_slab
+        )
+    else:
+        result = get_fallback_response(amount, data["deposit_date"], data["withdrawal_date"])
+
+    # Save to database
+    tax_calc = TaxCalculation(
         investment_type=data["investment_type"],
         amount=amount,
-        deposit_date=data["deposit_date"],
-        withdrawal_date=data["withdrawal_date"],
+        deposit_date=deposit.date(),
+        withdrawal_date=withdrawal.date(),
         age_bracket=age_bracket,
-        income_slab=income_slab
+        income_slab=income_slab,
+        ai_report=json.dumps(result),
+        confidence=result.get("confidence", 0),
+        gain_type=result.get("classification", {}).get("gain_type", "N/A"),
+        total_tax=result.get("tax_computation", {}).get("total_tax", 0)
     )
+    db.session.add(tax_calc)
+    db.session.commit()
 
-    return jsonify({"success": True, "result": result})
+    return jsonify({"success": True, "result": result, "id": tax_calc.id})
+
+
+@app.route("/api/tax-calculations", methods=["GET"])
+def list_tax_calculations():
+    calculations = TaxCalculation.query.order_by(TaxCalculation.created_at.desc()).all()
+    return jsonify([c.to_dict() for c in calculations])
+
+
+@app.route("/api/tax-calculations/<int:calc_id>", methods=["DELETE"])
+def delete_tax_calculation(calc_id):
+    calc = TaxCalculation.query.get_or_404(calc_id)
+    db.session.delete(calc)
+    db.session.commit()
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":

@@ -11,6 +11,10 @@ _tax_cache = {}
 CACHE_DURATION = timedelta(hours=24)
 
 
+def is_gemini_available():
+    return bool(os.environ.get("GEMINI_API_KEY"))
+
+
 def _build_prompt(investment_type, amount, deposit_date, withdrawal_date, age_bracket, income_slab):
     holding_days = (datetime.strptime(withdrawal_date, "%Y-%m-%d") - datetime.strptime(deposit_date, "%Y-%m-%d")).days
 
@@ -52,8 +56,18 @@ Respond ONLY with a valid JSON object (no markdown, no explanation outside JSON)
         "exemption_details": "string (any exemptions applied and why)",
         "important_notes": "string (any caveats, indexation benefits, grandfathering clauses, etc.)"
     }},
+    "investment_ideas": [
+        {{
+            "title": "string (name of the investment idea)",
+            "description": "string (brief description of the investment)",
+            "potential_benefit": "string (key benefit or expected return)",
+            "risk_level": "string (low, medium, or high)"
+        }}
+    ],
     "confidence": "number between 0 and 1 (your confidence in this analysis)"
 }}
+
+Additionally, suggest 3-5 alternative or complementary investment ideas based on the investment type, amount, tax implications, and investor profile (age bracket and income slab). Focus on tax-efficient options available in India.
 
 Important rules:
 - Use the latest Indian tax rules (FY 2024-25 / AY 2025-26)
@@ -79,7 +93,7 @@ def _call_gemini_api(prompt):
         "generationConfig": {
             "temperature": 0.1,
             "topP": 0.8,
-            "maxOutputTokens": 2048
+            "maxOutputTokens": 4096
         }
     }
 
@@ -119,6 +133,10 @@ def _parse_gemini_response(response):
             if key not in result:
                 print(f"Missing required key in Gemini response: {key}")
                 return None
+
+        # Default investment_ideas to empty list if missing
+        if "investment_ideas" not in result:
+            result["investment_ideas"] = []
 
         return result
     except (KeyError, json.JSONDecodeError, IndexError) as e:
@@ -177,6 +195,26 @@ def get_fallback_response(amount, deposit_date, withdrawal_date):
             "exemption_details": f"{'Standard Rs 1,00,000 LTCG exemption applied under Section 112A.' if is_ltcg else 'No exemption applicable for STCG.'}",
             "important_notes": "This is a fallback estimate. For accurate tax computation, please ensure the Gemini API key is configured. Actual tax may vary based on investment type, indexation benefits, and other factors."
         },
+        "investment_ideas": [
+            {
+                "title": "ELSS (Equity Linked Savings Scheme)",
+                "description": "Tax-saving mutual funds with a 3-year lock-in period. Offers Section 80C deduction up to Rs 1.5 lakh and potential for high equity returns.",
+                "potential_benefit": "Up to Rs 46,800 tax saving per year under Section 80C plus equity market returns",
+                "risk_level": "medium"
+            },
+            {
+                "title": "PPF (Public Provident Fund)",
+                "description": "Government-backed long-term savings scheme with 15-year lock-in. Interest and maturity are fully tax-exempt under EEE status.",
+                "potential_benefit": "Guaranteed returns (~7.1% p.a.) with complete tax exemption on interest and maturity",
+                "risk_level": "low"
+            },
+            {
+                "title": "NPS (National Pension System)",
+                "description": "Retirement-focused investment with additional Rs 50,000 deduction under Section 80CCD(1B) over and above Section 80C limits.",
+                "potential_benefit": "Extra Rs 50,000 tax deduction plus market-linked returns for retirement corpus",
+                "risk_level": "medium"
+            }
+        ],
         "confidence": 0.3
     }
 

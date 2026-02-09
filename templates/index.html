@@ -803,6 +803,383 @@
             line-height: 1.5;
         }
 
+        /* AI Toggle */
+        .ai-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .ai-toggle-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .ai-toggle {
+            width: 48px;
+            height: 26px;
+            background: #e2e8f0;
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .ai-toggle.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .ai-toggle.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+
+        .ai-toggle.active::after {
+            transform: translateX(22px);
+        }
+
+        .ai-toggle-status {
+            font-size: 0.78rem;
+            font-weight: 600;
+            min-width: 28px;
+        }
+
+        .ai-toggle-status.on {
+            color: #6366f1;
+        }
+
+        .ai-toggle-status.off {
+            color: #94a3b8;
+        }
+
+        /* AI Busy Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+
+        .modal-message {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.03);
+        }
+
+        /* Investment Ideas */
+        .investment-ideas-section {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .investment-ideas-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .investment-ideas-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .investment-ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .idea-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid #8b5cf6;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .idea-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        .idea-card .idea-title {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .idea-card .idea-description {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .idea-card .idea-benefit {
+            font-size: 0.82rem;
+            color: #10b981;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .idea-risk {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .idea-risk.low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .idea-risk.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .idea-risk.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Tax History */
+        .tax-history-section {
+            margin-top: 32px;
+        }
+
+        .tax-history-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 32px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item-header:hover {
+            background: #f8fafc;
+        }
+
+        .history-item-summary {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .history-item-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .history-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-item-type {
+            font-weight: 600;
+            color: #1a1a2e;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .history-item-tax {
+            text-align: right;
+            margin-right: 12px;
+        }
+
+        .history-item-tax .tax-value {
+            font-weight: 700;
+            color: #ef4444;
+            font-size: 0.95rem;
+        }
+
+        .history-item-tax .tax-label {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .history-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #94a3b8;
+            padding: 4px;
+            transition: transform 0.3s, color 0.2s;
+        }
+
+        .history-expand-btn:hover {
+            color: #6366f1;
+        }
+
+        .history-expand-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .history-delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .history-delete-btn:hover {
+            color: #ef4444;
+        }
+
+        .history-item-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .history-item-body.expanded {
+            max-height: 3000px;
+        }
+
+        .history-item-body-inner {
+            padding: 0 20px 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .history-item-body-inner .tax-detail-section {
+            margin-top: 16px;
+            box-shadow: none;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
         @media (max-width: 600px) {
             .header {
                 flex-direction: column;
@@ -829,6 +1206,14 @@
 </head>
 <body>
     <div class="toast-container" id="toast-container"></div>
+    <div class="modal-overlay" id="ai-busy-modal">
+        <div class="modal-box">
+            <div class="modal-icon">🤖</div>
+            <div class="modal-title" data-i18n="aiBusyTitle">AI Unavailable</div>
+            <div class="modal-message" data-i18n="aiBusyMessage">AI is busy, sorry! The Gemini API key is not configured. Calculations will use the built-in estimator instead.</div>
+            <button class="modal-btn" onclick="closeAiBusyModal()" data-i18n="okGotIt">OK, Got it</button>
+        </div>
+    </div>
     <div class="container">
         <div class="greeting" style="font-size: 1.5rem; font-weight: 600; color: #6366f1; margin-bottom: 8px;">
             {{ greeting }}
@@ -1048,7 +1433,14 @@
         <!-- Tax Calculator Tab -->
         <div id="tax-calculator" class="tab-content">
             <div class="form-card">
-                <h2 data-i18n="taxCalcTitle">Investment Tax Calculator</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 data-i18n="taxCalcTitle" style="margin-bottom: 0;">Investment Tax Calculator</h2>
+                    <div class="ai-toggle-container" style="margin-bottom: 0;">
+                        <span class="ai-toggle-label" data-i18n="useGeminiAI">Gemini AI</span>
+                        <div class="ai-toggle" id="ai-toggle" onclick="toggleAI()"></div>
+                        <span class="ai-toggle-status off" id="ai-toggle-status" data-i18n="off">OFF</span>
+                    </div>
+                </div>
                 <form class="tax-form" onsubmit="calculateTax(event)">
                     <div class="form-group" style="grid-column: 1 / -1;">
                         <label data-i18n="investmentType">Investment Type</label>
@@ -1132,9 +1524,21 @@
                     <div id="tax-explanation-details"></div>
                 </div>
 
+                <div class="investment-ideas-section" id="investment-ideas-section">
+                    <div class="tax-detail-section">
+                        <h3 data-i18n="investmentIdeasTitle">Investment Ideas</h3>
+                        <div class="investment-ideas-grid" id="investment-ideas-grid"></div>
+                    </div>
+                </div>
+
                 <div class="tax-disclaimer" data-i18n="taxDisclaimer">
                     This tax calculation is AI-generated and for informational purposes only. It should not be considered as professional tax advice. Please consult a qualified Chartered Accountant or tax professional for actual tax filing. Tax laws are subject to change and individual circumstances may vary.
                 </div>
+            </div>
+
+            <div class="tax-history-section">
+                <h2 data-i18n="previousCalculations">Previous Calculations</h2>
+                <div id="tax-history-list"></div>
             </div>
         </div>
     </div>
@@ -1221,7 +1625,23 @@
                 validationFillFields: "Please fill in all required fields",
                 validationPositiveAmount: "Please enter a positive amount",
                 validationDateOrder: "Withdrawal date must be after investment date",
-                taxCalcError: "Failed to calculate tax. Please try again."
+                taxCalcError: "Failed to calculate tax. Please try again.",
+                investmentIdeasTitle: "Investment Ideas",
+                previousCalculations: "Previous Calculations",
+                noHistoryYet: "No previous calculations yet. Submit a calculation above to get started.",
+                confirmDeleteCalc: "Are you sure you want to delete this calculation?",
+                calcDeleted: "Calculation deleted successfully",
+                calcDeleteFailed: "Failed to delete calculation",
+                riskLow: "Low Risk",
+                riskMedium: "Medium Risk",
+                riskHigh: "High Risk",
+                potentialBenefit: "Potential Benefit",
+                useGeminiAI: "Gemini AI",
+                on: "ON",
+                off: "OFF",
+                aiBusyTitle: "AI Unavailable",
+                aiBusyMessage: "AI is busy, sorry! The Gemini API key is not configured. Calculations will use the built-in estimator instead.",
+                okGotIt: "OK, Got it"
             },
             ml: {
                 title: "മണിസേവർ",
@@ -1302,7 +1722,23 @@
                 validationFillFields: "ദയവായി ആവശ്യമായ എല്ലാ ഫീൽഡുകളും പൂരിപ്പിക്കുക",
                 validationPositiveAmount: "ദയവായി ഒരു പോസിറ്റീവ് തുക നൽകുക",
                 validationDateOrder: "പിൻവലിക്കൽ തീയതി നിക്ഷേപ തീയതിക്ക് ശേഷമായിരിക്കണം",
-                taxCalcError: "നികുതി കണക്കാക്കൽ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക."
+                taxCalcError: "നികുതി കണക്കാക്കൽ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കുക.",
+                investmentIdeasTitle: "നിക്ഷേപ ആശയങ്ങൾ",
+                previousCalculations: "മുൻ കണക്കുകൂട്ടലുകൾ",
+                noHistoryYet: "മുൻ കണക്കുകൂട്ടലുകൾ ഇല്ല. ആരംഭിക്കാൻ മുകളിൽ ഒരു കണക്കുകൂട്ടൽ സമർപ്പിക്കുക.",
+                confirmDeleteCalc: "ഈ കണക്കുകൂട്ടൽ ഇല്ലാതാക്കണമെന്ന് ഉറപ്പാണോ?",
+                calcDeleted: "കണക്കുകൂട്ടൽ വിജയകരമായി ഇല്ലാതാക്കി",
+                calcDeleteFailed: "കണക്കുകൂട്ടൽ ഇല്ലാതാക്കൽ പരാജയപ്പെട്ടു",
+                riskLow: "കുറഞ്ഞ റിസ്ക്",
+                riskMedium: "മിതമായ റിസ്ക്",
+                riskHigh: "ഉയർന്ന റിസ്ക്",
+                potentialBenefit: "സാധ്യതയുള്ള നേട്ടം",
+                useGeminiAI: "ജെമിനി AI",
+                on: "ഓൺ",
+                off: "ഓഫ്",
+                aiBusyTitle: "AI ലഭ്യമല്ല",
+                aiBusyMessage: "AI തിരക്കിലാണ്, ക്ഷമിക്കണം! Gemini API കീ ക്രമീകരിച്ചിട്ടില്ല. കണക്കുകൂട്ടലുകൾ ബിൽറ്റ്-ഇൻ എസ്റ്റിമേറ്റർ ഉപയോഗിക്കും.",
+                okGotIt: "ശരി, മനസ്സിലായി"
             }
         };
 
@@ -1339,6 +1775,11 @@
             if (chartsInitialized) {
                 updateChartLabels();
             }
+
+            // Update AI toggle status text
+            if (document.getElementById('ai-toggle-status')) {
+                updateAIToggle();
+            }
         }
 
         function toggleLanguage() {
@@ -1357,6 +1798,11 @@
             // Initialize analytics charts when switching to analytics tab
             if (tabId === 'analytics' && !spendingChart2) {
                 initAnalyticsCharts();
+            }
+
+            // Load tax history when switching to tax-calculator tab
+            if (tabId === 'tax-calculator') {
+                loadTaxHistory();
             }
         }
 
@@ -1680,7 +2126,8 @@
                         deposit_date: depositDate,
                         withdrawal_date: withdrawalDate,
                         age_bracket: ageBracket,
-                        income_slab: incomeSlab
+                        income_slab: incomeSlab,
+                        use_ai: useAI
                     })
                 });
 
@@ -1752,14 +2199,235 @@
             `;
             document.getElementById('tax-explanation-details').innerHTML = expHtml;
 
+            // Investment ideas
+            const ideas = result.investment_ideas || [];
+            const ideasSection = document.getElementById('investment-ideas-section');
+            const ideasGrid = document.getElementById('investment-ideas-grid');
+
+            if (ideas.length > 0) {
+                const riskLabels = { low: t.riskLow, medium: t.riskMedium, high: t.riskHigh };
+                let ideasHtml = '';
+                ideas.forEach(idea => {
+                    const riskClass = (idea.risk_level || 'medium').toLowerCase();
+                    const riskLabel = riskLabels[riskClass] || idea.risk_level;
+                    ideasHtml += `
+                        <div class="idea-card">
+                            <div class="idea-title">${idea.title || ''}</div>
+                            <div class="idea-description">${idea.description || ''}</div>
+                            <div class="idea-benefit">${t.potentialBenefit}: ${idea.potential_benefit || ''}</div>
+                            <span class="idea-risk ${riskClass}">${riskLabel}</span>
+                        </div>
+                    `;
+                });
+                ideasGrid.innerHTML = ideasHtml;
+                ideasSection.classList.add('active');
+            } else {
+                ideasSection.classList.remove('active');
+            }
+
             // Show results
             document.getElementById('tax-results').classList.add('active');
+
+            // Reload history
+            loadTaxHistory();
+        }
+
+        // AI Toggle
+        let useAI = false;
+        let geminiAvailable = false;
+
+        async function checkGeminiStatus() {
+            try {
+                const response = await fetch('/api/gemini-status');
+                const data = await response.json();
+                geminiAvailable = data.available;
+                if (geminiAvailable) {
+                    useAI = true;
+                    updateAIToggle();
+                }
+            } catch (error) {
+                console.error('Failed to check Gemini status:', error);
+            }
+        }
+
+        function toggleAI() {
+            if (!useAI && !geminiAvailable) {
+                document.getElementById('ai-busy-modal').classList.add('active');
+                return;
+            }
+            useAI = !useAI;
+            updateAIToggle();
+        }
+
+        function updateAIToggle() {
+            const t = translations[currentLang];
+            const toggle = document.getElementById('ai-toggle');
+            const status = document.getElementById('ai-toggle-status');
+            if (useAI) {
+                toggle.classList.add('active');
+                toggle.classList.remove('disabled');
+                status.textContent = t.on;
+                status.className = 'ai-toggle-status on';
+            } else {
+                toggle.classList.remove('active');
+                if (!geminiAvailable) toggle.classList.add('disabled');
+                status.textContent = t.off;
+                status.className = 'ai-toggle-status off';
+            }
+        }
+
+        function closeAiBusyModal() {
+            document.getElementById('ai-busy-modal').classList.remove('active');
+        }
+
+        // Tax History functions
+        async function loadTaxHistory() {
+            try {
+                const response = await fetch('/api/tax-calculations');
+                const calculations = await response.json();
+                renderTaxHistory(calculations);
+            } catch (error) {
+                console.error('Failed to load tax history:', error);
+            }
+        }
+
+        function renderTaxHistory(calculations) {
+            const t = translations[currentLang];
+            const container = document.getElementById('tax-history-list');
+
+            if (!calculations || calculations.length === 0) {
+                container.innerHTML = `<div class="history-empty">${t.noHistoryYet}</div>`;
+                return;
+            }
+
+            let html = '';
+            calculations.forEach(calc => {
+                const date = new Date(calc.created_at).toLocaleDateString(currentLang === 'ml' ? 'ml-IN' : 'en-IN', {
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                html += `
+                    <div class="history-item" id="history-item-${calc.id}">
+                        <div class="history-item-header" onclick="toggleHistoryItem(${calc.id})">
+                            <div class="history-item-summary">
+                                <div class="history-item-icon">${calc.gain_type === 'LTCG' ? '📈' : '📊'}</div>
+                                <div class="history-item-info">
+                                    <div class="history-item-type">${calc.investment_type}</div>
+                                    <div class="history-item-meta">${date} &middot; ₹${Number(calc.amount).toLocaleString('en-IN')} &middot; ${calc.gain_type}</div>
+                                </div>
+                            </div>
+                            <div class="history-item-tax">
+                                <div class="tax-value">₹${Number(calc.total_tax).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
+                                <div class="tax-label">tax</div>
+                            </div>
+                            <div class="history-item-actions">
+                                <button class="history-expand-btn" id="expand-btn-${calc.id}">▼</button>
+                                <button class="history-delete-btn" onclick="event.stopPropagation(); deleteTaxCalculation(${calc.id})">✕</button>
+                            </div>
+                        </div>
+                        <div class="history-item-body" id="history-body-${calc.id}">
+                            <div class="history-item-body-inner">
+                                ${renderHistoryReport(calc, t)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderHistoryReport(calc, t) {
+            const report = calc.ai_report || {};
+            const cl = report.classification || {};
+            const tc = report.tax_computation || {};
+            const ex = report.explanation || {};
+            const ideas = report.investment_ideas || [];
+
+            let html = '';
+
+            // Classification
+            html += `<div class="tax-detail-section"><h3>${t.classificationTitle}</h3>
+                <div class="detail-row"><span class="detail-label">${t.classCategory}</span><span class="detail-value">${cl.investment_category || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classGainType}</span><span class="detail-value">${cl.gain_type || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classHoldingDays}</span><span class="detail-value">${cl.holding_period_days || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classThreshold}</span><span class="detail-value">${cl.ltcg_threshold_days || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.classAnalysis}</span><span class="detail-value">${cl.holding_analysis || '-'}</span></div>
+            </div>`;
+
+            // Tax computation
+            html += `<div class="tax-detail-section"><h3>${t.computationTitle}</h3>
+                <div class="detail-row"><span class="detail-label">${t.compSection}</span><span class="detail-value">${tc.applicable_section || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compBaseRate}</span><span class="detail-value">${tc.base_tax_rate_percent || 0}%</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compSurcharge}</span><span class="detail-value">${tc.surcharge_percent || 0}%</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compCess}</span><span class="detail-value">${tc.cess_percent || 0}%</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compExemption}</span><span class="detail-value">₹${(tc.exemption_limit || 0).toLocaleString('en-IN')}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compTaxable}</span><span class="detail-value">₹${(tc.taxable_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compTotalTax}</span><span class="detail-value" style="color:#ef4444;font-weight:700;">₹${(tc.total_tax || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span></div>
+                <div class="detail-row"><span class="detail-label">${t.compEffectiveRate}</span><span class="detail-value">${(tc.effective_rate_percent || 0).toFixed(2)}%</span></div>
+            </div>`;
+
+            // Explanation
+            html += `<div class="tax-detail-section"><h3>${t.explanationTitle}</h3>
+                <div class="explanation-block"><strong>${t.expClassReasoning}</strong>${ex.classification_reasoning || '-'}</div>
+                <div class="explanation-block"><strong>${t.expTaxReasoning}</strong>${ex.tax_section_reasoning || '-'}</div>
+                <div class="explanation-block"><strong>${t.expExemptions}</strong>${ex.exemption_details || '-'}</div>
+                <div class="explanation-block"><strong>${t.expNotes}</strong>${ex.important_notes || '-'}</div>
+            </div>`;
+
+            // Investment ideas
+            if (ideas.length > 0) {
+                const riskLabels = { low: t.riskLow, medium: t.riskMedium, high: t.riskHigh };
+                html += `<div class="tax-detail-section"><h3>${t.investmentIdeasTitle}</h3><div class="investment-ideas-grid">`;
+                ideas.forEach(idea => {
+                    const riskClass = (idea.risk_level || 'medium').toLowerCase();
+                    const riskLabel = riskLabels[riskClass] || idea.risk_level;
+                    html += `
+                        <div class="idea-card">
+                            <div class="idea-title">${idea.title || ''}</div>
+                            <div class="idea-description">${idea.description || ''}</div>
+                            <div class="idea-benefit">${t.potentialBenefit}: ${idea.potential_benefit || ''}</div>
+                            <span class="idea-risk ${riskClass}">${riskLabel}</span>
+                        </div>
+                    `;
+                });
+                html += `</div></div>`;
+            }
+
+            return html;
+        }
+
+        function toggleHistoryItem(id) {
+            const body = document.getElementById(`history-body-${id}`);
+            const btn = document.getElementById(`expand-btn-${id}`);
+            body.classList.toggle('expanded');
+            btn.classList.toggle('expanded');
+        }
+
+        async function deleteTaxCalculation(id) {
+            const t = translations[currentLang];
+            if (!confirm(t.confirmDeleteCalc)) return;
+
+            try {
+                const response = await fetch(`/api/tax-calculations/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    const item = document.getElementById(`history-item-${id}`);
+                    if (item) item.remove();
+                    showToast(t.calcDeleted);
+                    // If list is now empty, reload to show empty state
+                    const remaining = document.querySelectorAll('.history-item');
+                    if (remaining.length === 0) loadTaxHistory();
+                } else {
+                    showToast(t.calcDeleteFailed, 'error');
+                }
+            } catch (error) {
+                showToast(t.calcDeleteFailed, 'error');
+            }
         }
 
         // Initialize
         initCharts();
         applyTranslations();
         fetchExchangeRates();
+        checkGeminiStatus();
     </script>
 </body>
 </html>

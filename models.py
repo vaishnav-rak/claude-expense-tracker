@@ -1,3 +1,4 @@
+import json
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -45,4 +46,41 @@ class Budget(db.Model):
             'id': self.id,
             'category': self.category,
             'amount': self.amount
+        }
+
+
+class TaxCalculation(db.Model):
+    __tablename__ = 'tax_calculations'
+
+    id = db.Column(db.Integer, primary_key=True)
+    investment_type = db.Column(db.String(255), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    deposit_date = db.Column(db.Date, nullable=False)
+    withdrawal_date = db.Column(db.Date, nullable=False)
+    age_bracket = db.Column(db.String(50), nullable=False)
+    income_slab = db.Column(db.String(50), nullable=False)
+    ai_report = db.Column(db.Text, nullable=False)
+    confidence = db.Column(db.Float, nullable=False, default=0)
+    gain_type = db.Column(db.String(10), nullable=False)
+    total_tax = db.Column(db.Float, nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        try:
+            report = json.loads(self.ai_report)
+        except (json.JSONDecodeError, TypeError):
+            report = {}
+        return {
+            'id': self.id,
+            'investment_type': self.investment_type,
+            'amount': self.amount,
+            'deposit_date': self.deposit_date.strftime('%Y-%m-%d'),
+            'withdrawal_date': self.withdrawal_date.strftime('%Y-%m-%d'),
+            'age_bracket': self.age_bracket,
+            'income_slab': self.income_slab,
+            'ai_report': report,
+            'confidence': self.confidence,
+            'gain_type': self.gain_type,
+            'total_tax': self.total_tax,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None
         }
